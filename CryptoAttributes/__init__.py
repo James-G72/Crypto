@@ -1,0 +1,1 @@
+from .store import CryptoStorage as CryStor
