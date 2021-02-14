@@ -1,6 +1,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
+import datetime
 
 class CryptoStorage():
     """
@@ -16,7 +17,8 @@ class CryptoStorage():
         self.latest_prices = {}
         self.Current_price(first_coin)
 
-        # self.historic_data = pd.dataframe(columns=[first_coin])
+
+        self.historic_data = pd.DataFrame(index=[x for x in pd.date_range(datetime.datetime.today().date(),"2000-01-01")])
 
     def Current_price(self, *coins):
         """
@@ -40,17 +42,18 @@ class CryptoStorage():
 
     def Full_price_loader(self, coin):
         """
-        Used to load the full history of specified coins from the website
-        :param coins: A dictionary or array of coins to be processed
-        :param website: The front of a website. Coingecko is the only one which currently works
+        Used to load the full history of specified coins from the website specified for this object
+        :param coin: A coin to be added to the historical data page
         :return: None
         """
-        url = self.data_origin+'/coins/'+coin+'/historical_data/gbp#panel'
+        url = self.data_origin+'/coins/'+coin+'/historical_data/gbp?start_date=1980-01-01&end_date='+str(datetime.datetime.today().date())+'#panel'
         r = requests.get(url)
         html = r.content
-        page = BeautifulSoup(html,"html.parser")
+        page = BeautifulSoup(html, "html.parser")
         table_string = page.table.tbody.text
         stuff = list(filter(None, table_string.splitlines()))
-
-        print(stuff)
+        dates = stuff[0::5]
+        prices = stuff[3::5]
+        print(dates)
+        print(prices)
 
